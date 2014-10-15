@@ -1,168 +1,133 @@
-/*
- * BZOJ-3223 文艺平衡树
- *  Splay 
- */
+/* BZOJ-3223: Tyvj 1729 文艺平衡树 
+ *  Splay */
 #include <cstdio>
 #include <algorithm>
 
-template<int NodeSize>
-class splay
+const int MaxN = 100005;
+int N, M;
+int root = 1, total;
+int rev[MaxN], son[MaxN][2], fa[MaxN], size[MaxN], value[MaxN];
+
+bool not_root(int u)
 {
-	int son[NodeSize + 1][2];
-	int fa[NodeSize + 1];
-	int value[NodeSize + 1];
-	int csz[NodeSize + 1];
-	int lazy[NodeSize + 1];
-	int root;
-	int size;
-private:
-	void push_up(int x)
+	int f = fa[u];
+	return son[f][1] == u || son[f][0] == u;
+}
+
+void pushup(int u)
+{
+	size[u] = size[son[u][0]] + size[son[u][1]] + 1;
+}
+
+void rotate(int u)
+{
+	int f = fa[u];
+	int p = son[f][0] == u;
+
+	fa[u] = fa[f];
+	if(not_root(f))
+		son[fa[f]][son[fa[f]][1] == f] = u;
+
+	son[f][!p] = son[u][p];
+	if(son[u][p]) fa[son[u][p]] = f;
+	fa[son[u][p] = f] = u;
+
+	pushup(f);
+}
+
+void pushdown(int u)
+{
+	if(rev[u])
 	{
-		csz[x] = csz[son[x][0]]
-			+ csz[son[x][1]] + 1;
+		rev[u] = 0;
+		std::swap(son[u][0], son[u][1]);
+		rev[son[u][0]] ^= 1;
+		rev[son[u][1]] ^= 1;
+	}
+}
+
+void clear_mark(int u)
+{
+	if(not_root(u))
+		clear_mark(fa[u]);
+	pushdown(u);
+}
+
+void splay(int u)
+{
+	for(clear_mark(u); not_root(u); rotate(u))
+	{
+		int f = fa[u];
+		if(not_root(f))
+			rotate((son[f][0] == u) ^ (son[fa[f]][0] == f) ? u : f);
 	}
 
-	void push_down(int x)
+	pushup(u);
+	root = u;
+}
+
+int find_kth(int k)
+{
+	int u = root;
+	while(u)
 	{
-		if(lazy[x] == 0) 
-			return;
-		std::swap(son[x][0], son[x][1]);
-		lazy[x] = 0;
-		lazy[son[x][0]] ^= 1;
-		lazy[son[x][1]] ^= 1;
-	}
-
-	void rotate(int x)
-	{
-		int y = fa[x];
-		int sx = son[y][1] == x;
-		int sy = son[fa[y]][1] == y;
-
-		son[fa[x] = fa[y]][sy] = x;
-		fa[son[y][sx] = son[x][sx ^ 1]] = y;
-		son[fa[y] = x][sx ^ 1] = y;
-
-		push_up(y);
-		push_up(x);
-	}
-
-	void splay_node(int x, int to)
-	{
-		while(fa[x] != to)
+		pushdown(u);
+		if(k > size[son[u][0]])
 		{
-			int y = fa[x];
-			if(fa[y] == to)
-			{
-				rotate(x);
-			} else {
-				int sx = son[y][1] == x;
-				int sy = son[fa[y]][1] == y;
-				rotate(sx == sy ? y : x);
-				rotate(x);
-			}
+			k -= size[son[u][0]] + 1;
+			if(k == 0) return u;
+			u = son[u][1];
+		} else {
+			u = son[u][0];
 		}
-
-		son[0][0] = son[0][1] = fa[0]
-			= csz[0] = lazy[0] = 0;
-		if(to == 0) 
-			root = x;
 	}
 
-public:
-	void insert(int v)
-	{
-		int x = root;
-		int y = 0;
-		while(x) 
-		{
-			y = x;
-			x = son[x][1];
-		}
+	return -1;
+}
 
-		value[++size] = v;
-		fa[size] = y;
-		son[y][1] = size;
-		csz[size] = 1;
-		lazy[size] = 0;
-		son[size][0] = son[size][1] = 0;
-		splay_node(size, 0);
-	}
-
-	int find(int k)
-	{
-		int x = root;
-		while(x)
-		{
-			push_down(x);
-			if(csz[son[x][0]] + 1 == k)
-				break;
-			if(k > csz[son[x][0]])
-			{
-				k -= csz[son[x][0]] + 1;
-				x = son[x][1];
-			} else {
-				x = son[x][0];
-			}
-		}
-
-		if(x) splay_node(x, 0);
-		return x;
-	}
-
-	void reverse(int a, int b)
-	{
-		int pa = find(a - 1);
-		root = son[pa][1];
-		fa[root] = 0;
-		son[pa][1] = 0;
-		push_up(pa);
-		int pb = find(b + 1 - (a - 1));
-		lazy[son[pb][0]] = 1;
-
-		int x = root;
-		int y = 0;
-		while(x)
-		{
-			push_down(y = x);
-			x = son[x][0];
-		}
-		
-		son[y][0] = pa;
-		fa[pa] = y;
-		splay_node(y, 0);
-	}
-
-	int get_root() const { return root; }
-
-	void print(int now)
-	{
-		if(now == 0)
-			return;
-		push_down(now);
-		print(son[now][0]);
-		if(value[now] != 0 && value[now] + 1 != size)
-			std::printf("%d ", value[now]);
-		print(son[now][1]);
-	}
-};
-
-splay<100010> sp;
+void print(int now)
+{
+	pushdown(now);
+	if(son[now][0]) print(son[now][0]);
+	if(value[now]) std::printf("%d ", value[now]);
+	if(son[now][1]) print(son[now][1]);
+}
 
 int main()
 {
-	int N, M;
 	std::scanf("%d %d", &N, &M);
-	for(int i = 0; i <= N + 1; ++i)
-		sp.insert(i);
+	for(int i = 0; i <= N; ++i)
+	{
+		size[++total] = N - i + 2;
+		value[total] = i;
+		son[total][1] = total + 1;
+		fa[total] = total - 1;
+	}
+
+	++total;
+	fa[total] = total - 1;
+	size[total] = 1;
 
 	for(int i = 0; i != M; ++i)
 	{
 		int a, b;
 		std::scanf("%d %d", &a, &b);
+
 		if(a == b) continue;
-		sp.reverse(a + 1, b + 1);
+
+		int ppa = find_kth(a); // prev
+		splay(ppa);
+		int pa = son[ppa][1];
+		fa[root = pa] = 0;
+
+		int nnb = find_kth(b - size[son[ppa][0]] + 1); // next
+		splay(nnb);
+		rev[son[nnb][0]] ^= 1;
+
+		son[fa[root] = ppa][1] = root;
+		root = ppa;
 	}
 
-	sp.print(sp.get_root());
+	print(root);
 	return 0;
 }
