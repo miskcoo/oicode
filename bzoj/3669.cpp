@@ -35,10 +35,11 @@ void pushdown(int u)
 void pushup(int u)
 {
 	max[u] = u;
-	if(val[max[u]] < val[max[son[u][0]]])
-		max[u] = max[son[u][0]];
-	if(val[max[u]] < val[max[son[u][1]]])
-		max[u] = max[son[u][1]];
+	int l = son[u][0], r = son[u][1];
+	if(val[max[u]] < val[max[l]])
+		max[u] = max[l];
+	if(val[max[u]] < val[max[r]])
+		max[u] = max[r];
 }
 
 void rotate(int u)
