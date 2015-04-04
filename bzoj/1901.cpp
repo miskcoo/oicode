@@ -34,18 +34,21 @@ struct node_t
 const int MaxN = 20001;
 memory_pool<node_t> mem;
 int size, data[MaxN], map[MaxN], oper[MaxN][4];
-node_t *left[MaxN], *right[MaxN], *root[MaxN];
+node_t *left[MaxN], *right[MaxN], *root[MaxN], *nil;
 
-node_t* update(node_t* now, int head, int tail, int pos, int val)
+node_t* update(node_t* n, int head, int tail, int pos, int val)
 {
-	node_t* n = mem.fetch();
-	*n = *now;
-	n->w += val;
+	if(n == nil)
+	{
+		n = mem.fetch();
+		n->l = n->r = nil;
+		n->w = val;
+	} else n->w += val;
 
 	if(head == tail) return n;
 	int m = (head + tail) >> 1;
-	if(pos <= m) n->l = update(now->l, head, m, pos, val);
-	else n->r = update(now->r, m + 1, tail, pos, val);
+	if(pos <= m) n->l = update(n->l, head, m, pos, val);
+	else n->r = update(n->r, m + 1, tail, pos, val);
 	return n;
 }
 
@@ -86,7 +89,7 @@ int get_ans(int l, int r, int k)
 
 int main()
 {
-	node_t* nil = mem.fetch();
+	nil = mem.fetch();
 	nil->l = nil->r = nil, nil->w = 0;
 	
 	int n, m, tot = 0;

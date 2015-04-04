@@ -23,7 +23,13 @@ void destroy(seg_t* now)
 
 seg_t* insert(seg_t* n, int l, int r, int pos, int v)
 {
-	if(n->w + v == 0) return seg_nil;
+	if(n->w + v == 0) 
+	{
+		if(n != seg_nil)
+			destroy(n);
+		return seg_nil;
+	}
+
 	if(n == seg_nil)
 	{
 		n = new seg_t;
