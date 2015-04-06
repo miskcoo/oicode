@@ -1,6 +1,5 @@
 /* BZOJ-3267: KC采花
- *  K 段最大子序列和
- *  线段树维护，费用流 */
+ *  网络流，线段树 */
 #include <cstdio>
 #include <algorithm>
 
@@ -219,5 +218,3 @@ int main()
 	}
 	return 0;
 }
-
-
