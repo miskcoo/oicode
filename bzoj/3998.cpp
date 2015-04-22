@@ -18,7 +18,7 @@ node_t *sam_head = node + used++, *sam_tail = sam_head;
 void sam_extend(int x)
 {
 	node_t *p = sam_tail, *n = node + used++;
-	sam_tail = n;
+	sam_tail = n; n->w2 = 1;
 	n->len = p->len + 1;
 	for(; p && !p->ch[x]; p = p->fa)
 		p->ch[x] = n;
@@ -31,7 +31,7 @@ void sam_extend(int x)
 			n->fa = p->ch[x];
 		} else {
 			node_t *q = p->ch[x], *r = node + used++;
-			*r = *q;
+			*r = *q; r->w2 = 0;
 			r->len = p->len + 1;
 			n->fa = q->fa = r;
 			for(; p && p->ch[x] == q; p = p->fa)
@@ -54,13 +54,6 @@ void sam_prework(int t)
 {
 	if(t)
 	{
-		node_t *now = sam_head;
-		for(int i = 0; str[i]; ++i)
-		{
-			now = now->ch[str[i] - 'a'];
-			++now->w2;
-		}
-
 		for(int i = used - 1; i >= 0; --i)
 		{
 			node_t *n = node + sn[i];
