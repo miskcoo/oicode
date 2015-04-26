@@ -2,6 +2,7 @@
  *  后缀自动机 */
 #include <cstdio>
 #include <cstring>
+#include <algorithm>
 
 const int MaxN = 400001, MaxAlpha = 26;
 struct node_t
@@ -93,7 +94,7 @@ int main()
 			if(p->lcs > p->nlcs)
 				p->lcs = p->nlcs;
 			if(p->f && p->f->nlcs < p->nlcs)
-				p->f->nlcs = p->nlcs;
+				p->f->nlcs = std::min(p->nlcs, p->f->len);
 			p->nlcs = 0;
 		}
 	}

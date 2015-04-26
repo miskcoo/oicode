@@ -1,6 +1,7 @@
 /* BZOJ-2946: [Poi2000]公共串
  *   后缀自动机 */
 #include <cstdio>
+#include <algorithm>
 #include <cstring>
 
 const int MaxN = 4010, MaxAlpha = 26;
@@ -71,7 +72,7 @@ int main()
 			node_t *n = node + sn[j];
 			if(n->lcs > n->nlcs) n->lcs = n->nlcs;
 			if(n->fa && n->fa->nlcs < n->nlcs)
-				n->fa->nlcs = n->nlcs;
+				n->fa->nlcs = std::min(n->nlcs, n->fa->len);
 			n->nlcs = 0;
 		}
 	}
