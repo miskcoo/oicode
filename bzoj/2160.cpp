@@ -63,16 +63,17 @@ int main()
 	pam_init();
 	for(int i = 0; str[i]; ++i)
 		pam_extend(str, i);
+
+	long long tot = 0;
 	for(int i = used - 1; i; --i)
 	{
 		node_t *n = node + i;
 		n->fail->w += n->w;
 		count[n->len] += n->w;
-		for(int j = 0; j != MaxAlpha; ++j)
-			if(n->ch[j]) n->w += n->ch[j]->w;
+		tot += n->w;
 	}
 
-	if(pam_odd->w < k)
+	if(tot < k)
 	{
 		std::puts("-1");
 	} else {
