@@ -143,6 +143,6 @@ int main()
 	inverse_transform(p, C.x);
 	value_t ans = (calc_t)C.x[n] * pow(inv_fac[n - 1], mod_v - 2) % mod_v;
 	if(ans < 0) ans += mod_v;
-	std::printf("%lld\n", ans);
+	std::printf("%d\n", ans);
 	return 0;
 }
